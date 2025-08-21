@@ -1,176 +1,30 @@
-<html lang="fa" dir="rtl"><head><script>
-    (function(){
-        let proxyEcharts = null;
-
-        let originInit = null;
-
-        const DefaultFontOptions = [
-            { key: 'xAxis', stylePath: 'xAxis.axisLabel' },
-            { key: 'yAxis', stylePath: 'yAxis.axisLabel' },
-            { key: 'legend', stylePath: 'legend.textStyle' },
-            { key: 'tooltip', stylePath: 'tooltip.textStyle' },
-            { key: 'title', stylePath: 'title.textStyle' },
-            { key: 'series', stylePath: 'series.n.label', isArray: true },
-        ];
-
-        function setVal(source, keys, val, setFn) {
-            if (!Array.isArray(keys)) {
-                keys = keys.split('.');
-            }
-            keys = [...keys];
-            const valKey = keys.pop();
-            while (keys.length) {
-                const parentKey = keys.shift();
-                if (typeof source[parentKey] !== 'object' && typeof source[parentKey] !== 'function') {
-                    const childKey = keys[0] === undefined ? valKey : keys[0];
-                    let newVal = {};
-                    if (!isNaN(childKey * 1)) {
-                        newVal = [];
-                    }
-                    if (setFn) {
-                        setFn(source, parentKey, newVal);
-                    } else {
-                        source[parentKey] = newVal;
-                    }
-                }
-                source = source[parentKey];
-            }
-            if (setFn) {
-                setFn(source, valKey, val);
-            } else {
-                source[valKey] = val;
-            }
-        }
-
-        function setFontFamily(options) {
-            return options;
-        }
-
-        function setSeriesFamily(options) {
-            if (options.series) {
-                options.series = options.series.map(item => {
-                    item.label = { ...item.label };
-                    return item;
-                });
-            }
-            return options;
-        }
-
-
-        function addResizeListener(echartsInstance) {
-            const mountDom = echartsInstance.getDom();
-            const resizeObserver = new ResizeObserver(() => {
-                echartsInstance.resize();
-            });
-            resizeObserver.observe(mountDom);
-            return resizeObserver;
-        }
-
-        function proxyInit(...arg) {
-            if (!originInit) return null;
-            let instance = null;
-            try {
-                instance = originInit.apply(this, arg);
-            } catch (e) {
-                console.error(e);
-                const div = document.createElement('div');
-                div.style.display = 'none';
-                document.body.appendChild(div);
-                instance = originInit.call(this, div);
-                document.body.removeChild(div);
-            }
-            const originSetOption = instance.setOption;
-            addResizeListener(instance);
-            instance.setOption = async function setOptionProxy(options) {
-                options = options || {};
-                options.animation = false;
-                try {
-                    return originSetOption.call(this, options);
-                } catch (e) {
-                    console.error(e);
-                    return originSetOption.call(this, {});
-                }
-            };
-            return instance;
-        }
-
-        Object.defineProperty(globalThis, 'echarts', {
-            get() {
-                return proxyEcharts;
-            },
-            set(value) {
-                originInit = value.init;
-                defineInit(value);
-                proxyEcharts = value;
-            },
-            configurable: true,
-        });
-
-        function defineInit(value) {
-            Object.defineProperty(value, 'init', {
-                get() {
-                    return proxyInit;
-                },
-                set(v) {
-                    originInit = v;
-                },
-                enumerable: true,
-            });
-        }
-    })()
-</script><script>console.warn = () => {};console.log = () => {};</script>
+<html lang="fa" dir="rtl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رزومه حرفه‌ای</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&amp;display=swap"
+          rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#1e40af'
-                    },
-                    borderRadius: {
-                        'none': '0px',
-                        'sm': '4px',
-                        DEFAULT: '8px',
-                        'md': '12px',
-                        'lg': '16px',
-                        'xl': '20px',
-                        '2xl': '24px',
-                        '3xl': '32px',
-                        'full': '9999px',
-                        'button': '8px'
-                    },
-                    fontFamily: {
-                        'vazir': ['Vazirmatn', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+    
     <style>
         :where([class^="ri-"])::before {
             content: "\f3c2";
         }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
         }
+
         .skill-bar {
             background: linear-gradient(90deg, #3b82f6 var(--progress), #e5e7eb var(--progress));
         }
     </style>
-    <script>
-        // window.setInterval = () => {};
-        // window.clearInterval = () => {};
-        // window.setTimeout = () => {};
-        // window.clearTimeout = () => {};
-    </script><style>
+
+    <style>
         /* 自定义滚动条样式 */
         /* WebKit 浏览器 (Chrome, Safari, Edge) */
         ::-webkit-scrollbar {
@@ -190,79 +44,612 @@
         ::-webkit-scrollbar-thumb:hover {
             background-color: rgba(0, 0, 0, 0.7); /* 悬停时颜色 */
         }
-    </style><script>
-        window.addEventListener('load', () => {
-            if (typeof AOS !== 'undefined' && AOS) {
-                AOS.refresh?.();
-            }
-        });
-    </script><script>(function () {
-        // 内存存储
-        const memoryStorage = {
-            local: new Map(),
-            session: new Map()
-        };
+    </style>
 
-        // 保存原始方法
-        // const originalLocalStorage = {
-        //   setItem: localStorage.setItem.bind(localStorage),
-        //   getItem: localStorage.getItem.bind(localStorage),
-        //   removeItem: localStorage.removeItem.bind(localStorage),
-        //   clear: localStorage.clear.bind(localStorage),
-        //   key: localStorage.key.bind(localStorage)
-        // };
 
-        // const originalSessionStorage = {
-        //   setItem: sessionStorage.setItem.bind(sessionStorage),
-        //   getItem: sessionStorage.getItem.bind(sessionStorage),
-        //   removeItem: sessionStorage.removeItem.bind(sessionStorage),
-        //   clear: sessionStorage.clear.bind(sessionStorage),
-        //   key: sessionStorage.key.bind(sessionStorage)
-        // };
+    <style>*, ::before, ::after {
+        --tw-border-spacing-x: 0;
+        --tw-border-spacing-y: 0;
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        --tw-rotate: 0;
+        --tw-skew-x: 0;
+        --tw-skew-y: 0;
+        --tw-scale-x: 1;
+        --tw-scale-y: 1;
+        --tw-pan-x: ;
+        --tw-pan-y: ;
+        --tw-pinch-zoom: ;
+        --tw-scroll-snap-strictness: proximity;
+        --tw-gradient-from-position: ;
+        --tw-gradient-via-position: ;
+        --tw-gradient-to-position: ;
+        --tw-ordinal: ;
+        --tw-slashed-zero: ;
+        --tw-numeric-figure: ;
+        --tw-numeric-spacing: ;
+        --tw-numeric-fraction: ;
+        --tw-ring-inset: ;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-color: rgb(59 130 246 / 0.5);
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-colored: 0 0 #0000;
+        --tw-blur: ;
+        --tw-brightness: ;
+        --tw-contrast: ;
+        --tw-grayscale: ;
+        --tw-hue-rotate: ;
+        --tw-invert: ;
+        --tw-saturate: ;
+        --tw-sepia: ;
+        --tw-drop-shadow: ;
+        --tw-backdrop-blur: ;
+        --tw-backdrop-brightness: ;
+        --tw-backdrop-contrast: ;
+        --tw-backdrop-grayscale: ;
+        --tw-backdrop-hue-rotate: ;
+        --tw-backdrop-invert: ;
+        --tw-backdrop-opacity: ;
+        --tw-backdrop-saturate: ;
+        --tw-backdrop-sepia: ;
+        --tw-contain-size: ;
+        --tw-contain-layout: ;
+        --tw-contain-paint: ;
+        --tw-contain-style:
+    }
 
-        // 只重写方法，不动属性
-        localStorage.setItem = function (key, value) {
-            memoryStorage.local.set(key, value);
-        };
 
-        localStorage.getItem = function (key) {
-            return memoryStorage.local.get(key) ?? null;
-        };
 
-        localStorage.removeItem = function (key) {
-            memoryStorage.local.delete(key);
-        };
+    /* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */
+    *, ::after, ::before {
+        box-sizing: border-box;
+        border-width: 0;
+        border-style: solid;
+        border-color: #e5e7eb
+    }
 
-        localStorage.clear = function () {
-            memoryStorage.local.clear();
-        };
+    ::after, ::before {
+        --tw-content: ''
+    }
 
-        localStorage.key = function (n) {
-            return Array.from(memoryStorage.local.keys())[n] ?? null;
-        };
+    :host, html {
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        -moz-tab-size: 4;
+        tab-size: 4;
+        font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        -webkit-tap-highlight-color: transparent
+    }
 
-        // sessionStorage 同样的处理
-        sessionStorage.setItem = function (key, value) {
-            memoryStorage.session.set(key, value);
-        };
+    body {
+        margin: 0;
+        line-height: inherit
+    }
 
-        sessionStorage.getItem = function (key) {
-            return memoryStorage.session.get(key) ?? null;
-        };
+    hr {
+        height: 0;
+        color: inherit;
+        border-top-width: 1px
+    }
 
-        sessionStorage.removeItem = function (key) {
-            memoryStorage.session.delete(key);
-        };
+    abbr:where([title]) {
+        -webkit-text-decoration: underline dotted;
+        text-decoration: underline dotted
+    }
 
-        sessionStorage.clear = function () {
-            memoryStorage.session.clear();
-        };
+    h1, h2, h3, h4, h5, h6 {
+        font-size: inherit;
+        font-weight: inherit
+    }
 
-        sessionStorage.key = function (n) {
-            return Array.from(memoryStorage.session.keys())[n] ?? null;
-        };
-    })();
-    </script><style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mt-1{margin-top:0.25rem}.mt-8{margin-top:2rem}.flex{display:flex}.grid{display:grid}.h-12{height:3rem}.h-2{height:0.5rem}.h-32{height:8rem}.h-5{height:1.25rem}.h-full{height:100%}.w-12{width:3rem}.w-32{width:8rem}.w-5{width:1.25rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.flex-1{flex:1 1 0%}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:16px}.border-4{border-width:4px}.border-b-2{border-bottom-width:2px}.border-r-4{border-right-width:4px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-primary{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.border-white{--tw-border-opacity:1;border-color:rgb(255 255 255 / var(--tw-border-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-primary{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-secondary{--tw-bg-opacity:1;background-color:rgb(30 64 175 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-l{background-image:linear-gradient(to left, var(--tw-gradient-stops))}.from-primary{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-secondary{--tw-gradient-to:#1e40af var(--tw-gradient-to-position)}.object-cover{object-fit:cover}.object-top{object-position:top}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.pb-2{padding-bottom:0.5rem}.pr-6{padding-right:1.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-relaxed{line-height:1.625}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-primary{--tw-text-opacity:1;color:rgb(59 130 246 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-90{opacity:0.9}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+    a {
+        color: inherit;
+        text-decoration: inherit
+    }
+
+    b, strong {
+        font-weight: bolder
+    }
+
+    code, kbd, pre, samp {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        font-size: 1em
+    }
+
+    small {
+        font-size: 80%
+    }
+
+    sub, sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline
+    }
+
+    sub {
+        bottom: -.25em
+    }
+
+    sup {
+        top: -.5em
+    }
+
+    table {
+        text-indent: 0;
+        border-color: inherit;
+        border-collapse: collapse
+    }
+
+    button, input, optgroup, select, textarea {
+        font-family: inherit;
+        font-feature-settings: inherit;
+        font-variation-settings: inherit;
+        font-size: 100%;
+        font-weight: inherit;
+        line-height: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        margin: 0;
+        padding: 0
+    }
+
+    button, select {
+        text-transform: none
+    }
+
+    button, input:where([type=button]), input:where([type=reset]), input:where([type=submit]) {
+        -webkit-appearance: button;
+        background-color: transparent;
+        background-image: none
+    }
+
+    :-moz-focusring {
+        outline: auto
+    }
+
+    :-moz-ui-invalid {
+        box-shadow: none
+    }
+
+    progress {
+        vertical-align: baseline
+    }
+
+    ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+        height: auto
+    }
+
+    [type=search] {
+        -webkit-appearance: textfield;
+        outline-offset: -2px
+    }
+
+    ::-webkit-search-decoration {
+        -webkit-appearance: none
+    }
+
+    ::-webkit-file-upload-button {
+        -webkit-appearance: button;
+        font: inherit
+    }
+
+    summary {
+        display: list-item
+    }
+
+    blockquote, dd, dl, figure, h1, h2, h3, h4, h5, h6, hr, p, pre {
+        margin: 0
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0
+    }
+
+    legend {
+        padding: 0
+    }
+
+    menu, ol, ul {
+        list-style: none;
+        margin: 0;
+        padding: 0
+    }
+
+    dialog {
+        padding: 0
+    }
+
+    textarea {
+        resize: vertical
+    }
+
+    input::placeholder, textarea::placeholder {
+        opacity: 1;
+        color: #9ca3af
+    }
+
+    [role=button], button {
+        cursor: pointer
+    }
+
+    :disabled {
+        cursor: default
+    }
+
+    audio, canvas, embed, iframe, img, object, svg, video {
+        display: block;
+        vertical-align: middle
+    }
+
+    img, video {
+        max-width: 100%;
+        height: auto
+    }
+
+    [hidden]:where(:not([hidden=until-found])) {
+        display: none
+    }
+
+    .mx-auto {
+        margin-left: auto;
+        margin-right: auto
+    }
+
+    .mb-1 {
+        margin-bottom: 0.25rem
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem
+    }
+
+    .mb-6 {
+        margin-bottom: 1.5rem
+    }
+
+    .mb-8 {
+        margin-bottom: 2rem
+    }
+
+    .mt-1 {
+        margin-top: 0.25rem
+    }
+
+    .mt-8 {
+        margin-top: 2rem
+    }
+
+    .flex {
+        display: flex
+    }
+
+    .grid {
+        display: grid
+    }
+
+    .h-12 {
+        height: 3rem
+    }
+
+    .h-2 {
+        height: 0.5rem
+    }
+
+    .h-32 {
+        height: 8rem
+    }
+
+    .h-5 {
+        height: 1.25rem
+    }
+
+    .h-full {
+        height: 100%
+    }
+
+    .w-12 {
+        width: 3rem
+    }
+
+    .w-32 {
+        width: 8rem
+    }
+
+    .w-5 {
+        width: 1.25rem
+    }
+
+    .w-full {
+        width: 100%
+    }
+
+    .max-w-4xl {
+        max-width: 56rem
+    }
+
+    .flex-1 {
+        flex: 1 1 0%
+    }
+
+    .items-start {
+        align-items: flex-start
+    }
+
+    .items-center {
+        align-items: center
+    }
+
+    .justify-center {
+        justify-content: center
+    }
+
+    .justify-between {
+        justify-content: space-between
+    }
+
+    .gap-2 {
+        gap: 0.5rem
+    }
+
+    .gap-4 {
+        gap: 1rem
+    }
+
+    .gap-6 {
+        gap: 1.5rem
+    }
+
+    .gap-8 {
+        gap: 2rem
+    }
+
+    .space-y-1 > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(0.25rem * var(--tw-space-y-reverse))
+    }
+
+    .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(1rem * var(--tw-space-y-reverse))
+    }
+
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(1.5rem * var(--tw-space-y-reverse))
+    }
+
+    .overflow-hidden {
+        overflow: hidden
+    }
+
+    .rounded-full {
+        border-radius: 9999px
+    }
+
+    .rounded-lg {
+        border-radius: 16px
+    }
+
+    .border-4 {
+        border-width: 4px
+    }
+
+    .border-b-2 {
+        border-bottom-width: 2px
+    }
+
+    .border-r-4 {
+        border-right-width: 4px
+    }
+
+    .border-gray-300 {
+        --tw-border-opacity: 1;
+        border-color: rgb(209 213 219 / var(--tw-border-opacity, 1))
+    }
+
+    .border-primary {
+        --tw-border-opacity: 1;
+        border-color: rgb(59 130 246 / var(--tw-border-opacity, 1))
+    }
+
+    .border-white {
+        --tw-border-opacity: 1;
+        border-color: rgb(255 255 255 / var(--tw-border-opacity, 1))
+    }
+
+    .bg-gray-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-gray-200 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-gray-50 {
+        --tw-bg-opacity: 1;
+        background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-primary {
+        --tw-bg-opacity: 1;
+        background-color: rgb(59 130 246 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-secondary {
+        --tw-bg-opacity: 1;
+        background-color: rgb(30 64 175 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-white {
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1))
+    }
+
+    .bg-gradient-to-l {
+        background-image: linear-gradient(to left, var(--tw-gradient-stops))
+    }
+
+    .from-primary {
+        --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
+        --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+    }
+
+    .to-secondary {
+        --tw-gradient-to: #1e40af var(--tw-gradient-to-position)
+    }
+
+    .object-cover {
+        object-fit: cover
+    }
+
+    .object-top {
+        object-position: top
+    }
+
+    .p-4 {
+        padding: 1rem
+    }
+
+    .p-6 {
+        padding: 1.5rem
+    }
+
+    .p-8 {
+        padding: 2rem
+    }
+
+    .px-3 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem
+    }
+
+    .py-1 {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem
+    }
+
+    .pb-2 {
+        padding-bottom: 0.5rem
+    }
+
+    .pr-6 {
+        padding-right: 1.5rem
+    }
+
+    .text-center {
+        text-align: center
+    }
+
+    .text-2xl {
+        font-size: 1.5rem;
+        line-height: 2rem
+    }
+
+    .text-4xl {
+        font-size: 2.25rem;
+        line-height: 2.5rem
+    }
+
+    .text-lg {
+        font-size: 1.125rem;
+        line-height: 1.75rem
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+        line-height: 1.25rem
+    }
+
+    .text-xl {
+        font-size: 1.25rem;
+        line-height: 1.75rem
+    }
+
+    .font-bold {
+        font-weight: 700
+    }
+
+    .font-medium {
+        font-weight: 500
+    }
+
+    .font-semibold {
+        font-weight: 600
+    }
+
+    .leading-relaxed {
+        line-height: 1.625
+    }
+
+    .text-gray-500 {
+        --tw-text-opacity: 1;
+        color: rgb(107 114 128 / var(--tw-text-opacity, 1))
+    }
+
+    .text-gray-600 {
+        --tw-text-opacity: 1;
+        color: rgb(75 85 99 / var(--tw-text-opacity, 1))
+    }
+
+    .text-gray-700 {
+        --tw-text-opacity: 1;
+        color: rgb(55 65 81 / var(--tw-text-opacity, 1))
+    }
+
+    .text-gray-800 {
+        --tw-text-opacity: 1;
+        color: rgb(31 41 55 / var(--tw-text-opacity, 1))
+    }
+
+    .text-primary {
+        --tw-text-opacity: 1;
+        color: rgb(59 130 246 / var(--tw-text-opacity, 1))
+    }
+
+    .text-white {
+        --tw-text-opacity: 1;
+        color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+    }
+
+    .opacity-90 {
+        opacity: 0.9
+    }
+
+    .shadow-lg {
+        --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+    }
+
+    @media (min-width: 768px) {
+        .md\:grid-cols-2 {
+            grid-template-columns:repeat(2, minmax(0, 1fr))
+        }
+
+        .md\:grid-cols-3 {
+            grid-template-columns:repeat(3, minmax(0, 1fr))
+        }
+    }</style>
+</head>
 <body class="bg-gray-50 text-gray-800">
 <div class="max-w-4xl mx-auto bg-white shadow-lg">
     <!-- Header Section -->
@@ -293,7 +680,9 @@
         <section class="mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-primary">خلاصه حرفه‌ای</h2>
             <p class="text-gray-700 leading-relaxed">
-                توسعه‌دهنده نرم‌افزار با ۴ سال تجربه در طراحی و پیاده‌سازی پروژه‌های وب، با علاقه‌مندی شدید به حل مسائل پیچیده و ساخت راه‌حل‌های خلاقانه. ورودم به دنیای برنامه‌نویسی از علاقه‌ام به معماها آغاز شد و امروز با همان انگیزه، در مسیر یادگیری مداوم و توسعه ابزارهای کاربردی قدم برمی‌دارم.
+                توسعه‌دهنده نرم‌افزار با ۴ سال تجربه در طراحی و پیاده‌سازی پروژه‌های وب، با علاقه‌مندی شدید به حل مسائل
+                پیچیده و ساخت راه‌حل‌های خلاقانه. ورودم به دنیای برنامه‌نویسی از علاقه‌ام به معماها آغاز شد و امروز با
+                همان انگیزه، در مسیر یادگیری مداوم و توسعه ابزارهای کاربردی قدم برمی‌دارم.
             </p>
         </section>
 
@@ -370,6 +759,23 @@
                     </ul>
                 </div>
 
+                                      <div class="border-r-4 border-primary pr-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">توسعه‌دهنده ASP.NET Core MVC</h3>
+                                    <p class="text-primary font-medium">پروژه فروشگاه آنلاین شخصی</p>
+                                </div>
+                                <span class="text-gray-500 text-sm bg-gray-100 px-3 py-1 rounded-full">زمستان ۱۴۰۲ تا بهار ۱۴۰۳</span>
+                            </div>
+                            <ul class="text-gray-700 space-y-1 text-sm">
+                                <li>• طراحی و توسعه یک فروشگاه آنلاین با ASP.NET Core MVC</li>
+                                <li>• پیاده‌سازی سیستم مدیریت محصولات، دسته‌بندی‌ها، سبد خرید و پرداخت</li>
+                                <li>• استفاده از Entity Framework Core برای مدیریت پایگاه داده SQL Server</li>
+                                <li>• طراحی لایه‌های جداگانه برای مدل، کنترلر و ویو با رعایت اصول معماری MVC</li>
+                                <li>• افزودن قابلیت احراز هویت کاربران و مدیریت نقش‌ها با Identity</li>
+                                <li>• مستندسازی کامل پروژه و انتشار آن به‌صورت لوکال و آنلاین</li>
+                            </ul>
+                        </div>
             </div>
         </section>
 
@@ -413,6 +819,15 @@
                                 <div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
                             </div>
                         </div>
+                      <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">C# & .NetCore</span>
+                                <span class="text-sm text-gray-500">۷۰٪</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span class="text-sm font-medium text-gray-700">JavaScript (ES6+)</span>
@@ -431,15 +846,7 @@
                                 <div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
                             </div>
                         </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-700">React.js</span>
-                                <span class="text-sm text-gray-500">۸۰٪</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
                 <div>
@@ -487,24 +894,24 @@
         </section>
 
         <div class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">زبان‌ها</h3>
-        <div class="grid md:grid-cols-3 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-                <h4 class="font-medium text-gray-800">فارسی</h4>
-                <p class="text-sm text-gray-600">زبان مادری</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-                <h4 class="font-medium text-gray-800">انگلیسی</h4>
-                <p class="text-sm text-gray-600">پیشرفته</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-                <h4 class="font-medium text-gray-800">عربی</h4>
-                <p class="text-sm text-gray-600">متوسط</p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">زبان‌ها</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <h4 class="font-medium text-gray-800">فارسی</h4>
+                    <p class="text-sm text-gray-600">زبان مادری</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <h4 class="font-medium text-gray-800">انگلیسی</h4>
+                    <p class="text-sm text-gray-600">پیشرفته</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <h4 class="font-medium text-gray-800">اسپانیایی</h4>
+                    <p class="text-sm text-gray-600">متوسط</p>
+                </div>
             </div>
         </div>
-    </div>
 
-<!--        <section class="mb-8">-->
+        <!--        <section class="mb-8">-->
         <!--            <h2 class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-primary">پروژه‌های منتخب</h2>-->
         <!--            <div class="grid md:grid-cols-2 gap-6">-->
 
@@ -544,126 +951,70 @@
         <!--        </section>-->
 
         <!-- Certificates -->
-<!--    <section class="mb-8">-->
-<!--        <h2 class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-primary">دوره‌ها و گواهینامه‌ها</h2>-->
-<!--        <div class="grid md:grid-cols-2 gap-6">-->
-<!--            <div class="bg-gray-50 p-6 rounded-lg">-->
-<!--                <div class="flex items-start gap-4">-->
-<!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
-<!--                        <i class="ri-award-line text-xl"></i>-->
-<!--                    </div>-->
-<!--                    <div class="flex-1">-->
-<!--                        <h3 class="font-semibold text-gray-800">AWS Certified Solutions Architect</h3>-->
-<!--                        <p class="text-primary text-sm font-medium">Amazon Web Services</p>-->
-<!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در مهر ۱۴۰۲</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="bg-gray-50 p-6 rounded-lg">-->
-<!--                <div class="flex items-start gap-4">-->
-<!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
-<!--                        <i class="ri-award-line text-xl"></i>-->
-<!--                    </div>-->
-<!--                    <div class="flex-1">-->
-<!--                        <h3 class="font-semibold text-gray-800">React Developer Certification</h3>-->
-<!--                        <p class="text-primary text-sm font-medium">Meta (Facebook)</p>-->
-<!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در تیر ۱۴۰۲</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="bg-gray-50 p-6 rounded-lg">-->
-<!--                <div class="flex items-start gap-4">-->
-<!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
-<!--                        <i class="ri-award-line text-xl"></i>-->
-<!--                    </div>-->
-<!--                    <div class="flex-1">-->
-<!--                        <h3 class="font-semibold text-gray-800">Scrum Master Certified</h3>-->
-<!--                        <p class="text-primary text-sm font-medium">Scrum Alliance</p>-->
-<!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در اردیبهشت ۱۴۰۱</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="bg-gray-50 p-6 rounded-lg">-->
-<!--                <div class="flex items-start gap-4">-->
-<!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
-<!--                        <i class="ri-award-line text-xl"></i>-->
-<!--                    </div>-->
-<!--                    <div class="flex-1">-->
-<!--                        <h3 class="font-semibold text-gray-800">Google Analytics Certified</h3>-->
-<!--                        <p class="text-primary text-sm font-medium">Google</p>-->
-<!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در دی ۱۴۰۰</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </section>-->
-</div>
-<!-- Footer -->
+        <!--    <section class="mb-8">-->
+        <!--        <h2 class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-primary">دوره‌ها و گواهینامه‌ها</h2>-->
+        <!--        <div class="grid md:grid-cols-2 gap-6">-->
+        <!--            <div class="bg-gray-50 p-6 rounded-lg">-->
+        <!--                <div class="flex items-start gap-4">-->
+        <!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
+        <!--                        <i class="ri-award-line text-xl"></i>-->
+        <!--                    </div>-->
+        <!--                    <div class="flex-1">-->
+        <!--                        <h3 class="font-semibold text-gray-800">AWS Certified Solutions Architect</h3>-->
+        <!--                        <p class="text-primary text-sm font-medium">Amazon Web Services</p>-->
+        <!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در مهر ۱۴۰۲</p>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="bg-gray-50 p-6 rounded-lg">-->
+        <!--                <div class="flex items-start gap-4">-->
+        <!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
+        <!--                        <i class="ri-award-line text-xl"></i>-->
+        <!--                    </div>-->
+        <!--                    <div class="flex-1">-->
+        <!--                        <h3 class="font-semibold text-gray-800">React Developer Certification</h3>-->
+        <!--                        <p class="text-primary text-sm font-medium">Meta (Facebook)</p>-->
+        <!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در تیر ۱۴۰۲</p>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="bg-gray-50 p-6 rounded-lg">-->
+        <!--                <div class="flex items-start gap-4">-->
+        <!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
+        <!--                        <i class="ri-award-line text-xl"></i>-->
+        <!--                    </div>-->
+        <!--                    <div class="flex-1">-->
+        <!--                        <h3 class="font-semibold text-gray-800">Scrum Master Certified</h3>-->
+        <!--                        <p class="text-primary text-sm font-medium">Scrum Alliance</p>-->
+        <!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در اردیبهشت ۱۴۰۱</p>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <div class="bg-gray-50 p-6 rounded-lg">-->
+        <!--                <div class="flex items-start gap-4">-->
+        <!--                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">-->
+        <!--                        <i class="ri-award-line text-xl"></i>-->
+        <!--                    </div>-->
+        <!--                    <div class="flex-1">-->
+        <!--                        <h3 class="font-semibold text-gray-800">Google Analytics Certified</h3>-->
+        <!--                        <p class="text-primary text-sm font-medium">Google</p>-->
+        <!--                        <p class="text-gray-500 text-sm mt-1">صادر شده در دی ۱۴۰۰</p>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <!--    </section>-->
+    </div>
+    <!-- Footer -->
     <footer class="mt-12 text-center text-gray-600 text-sm py-6 border-t border-gray-200">
-        <p>با افتخار ساخته شده توسط ابوالفضل اربابی — توسعه‌دهنده‌ای که عاشق حل مسئله و ساختن چیزهای مفید برای آدم‌هاست.</p>
-        <p class="mt-2">تماس: <a href="mailto:amir.programing81@gmail.com" class="text-primary hover:underline">amir.programing81@gmail.com</a> | تلفن: ۰۹۰۲۰۷۱۸۰۲۳</p>
+        <p>با افتخار ساخته شده توسط ابوالفضل اربابی — توسعه‌دهنده‌ای که عاشق حل مسئله و ساختن چیزهای مفید برای
+            آدم‌هاست.</p>
+        <p class="mt-2">تماس: <a href="mailto:amir.programing81@gmail.com" class="text-primary hover:underline">amir.programing81@gmail.com</a>
+            | تلفن: ۰۹۰۲۰۷۱۸۰۲۳</p>
         <p class="mt-2">© ۲۰۲۵ ابوالفضل اربابی. تمامی حقوق محفوظ است.</p>
     </footer>
-    
 
 
-<script>
-    (function () {
-        'use strict';
 
-        const originalWindowOpen = window.originalWindowOpen ?? window.open;
-
-        function processAnchor(url) {
-            // 查找锚点，平滑滚动
-            const anchor = document.querySelector(url);
-            if (anchor) {
-                anchor.scrollIntoView({ behavior: 'smooth' });
-            }
-            // 发送 hashchange 事件
-            const event = new Event('hashchange');
-            event.newURL = url;
-            event.oldURL = window.location.href;
-            // 因为预览 iframe 没有 url，所以需要手动设置
-            window.location.hash = url;
-            window.dispatchEvent(event);
-        }
-
-        // 重写 window.open
-        window.open = function (url, target, features) {
-            if (url.startsWith('#')) {
-                // 查找锚点，平滑滚动
-                processAnchor(url);
-                return;
-            }
-            originalWindowOpen(url, '_blank', features);
-            return null;
-        };
-    })();
-
-
-    window.addEventListener('click', (event) => {
-        const target = event.target;
-        const closest = target.closest('a');
-        if (!closest) return;
-        if (closest.tagName === 'A') {
-            event.preventDefault();
-            const href = closest.getAttribute('href');
-            if (!href) return;
-            // check is void link
-            if (['#', 'javascript:void(0)', ''].includes(href)) {
-                return;
-            }
-            // 锚点链接也不处理
-            if (href.startsWith('#')) {
-                return;
-            }
-            window.open(closest.href, '_blank');
-        }
-    });
-
-
-    document.addEventListener('submit', (event) => {
-        event.preventDefault();
-    }, true);
-
-</script></body></html>
+</body>
+</html>
